@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Typography</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            font-family: "Cormorant Garamond", serif;
+            color: rgba(255, 255, 255, 0.95);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            position: relative;
+            max-width: 1000px;
+            padding: 2rem;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .text-container {
+            position: relative;
+            font-size: 3.5rem;
+            line-height: 1.6;
+            text-align: center;
+            transform-style: preserve-3d;
+        }
+
+        .word {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(20px);
+            transform: translateY(20px) translateZ(-100px);
+            position: relative;
+            margin: 0 0.2em;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .word::before,
+        .word::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0.4;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+
+        .word::before {
+            color: #ff00ff;
+            transform: translateX(5px);
+        }
+
+        .word::after {
+            color: #00ffff;
+            transform: translateX(-5px);
+        }
+
+        .ripple-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .text-container {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="ripple-canvas"></canvas>
+    <div class="container">
+        <div class="text-container"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const text = "\"God, what do you want me to know and what do you want me to do?\"";
+            const container = document.querySelector('.text-container');
+            const containerWrapper = document.querySelector('.container');
+            const words = text.split(' ');
+            
+            // Create and animate words
+            function createWords() {
+                container.innerHTML = '';
+                const wordElements = words.map((word, index) => {
+                    const span = document.createElement('span');
+                    span.className = 'word';
+                    span.textContent = word;
+                    span.setAttribute('data-text', word);
+                    container.appendChild(span);
+                    return span;
+                });
+                
+                // Animate words in
+                wordElements.forEach((word, index) => {
+                    gsap.to(word, {
+                        opacity: 1,
+                        filter: "blur(0px)",
+                        y: 0,
+                        z: 0,
+                        duration: 2.5,
+                        delay: index * 0.25,
+                        ease: "power2.out"
+                    });
+                });
+                
+                return wordElements;
+            }
+            
+            // Initial word creation
+            const wordElements = createWords();
+            
+            // Ripple effect with Canvas 2D
+            const canvas = document.querySelector('.ripple-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Ripple class
+            class Ripple {
+                constructor(x, y, initialRadius = 0, speed = 5, alpha = 1, maxRadius = null) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = initialRadius;
+                    this.maxRadius = maxRadius || Math.max(canvas.width, canvas.height) * 0.8;
+                    this.speed = speed;
+                    this.alpha = alpha;
+                    this.lineWidth = 2 * alpha;
+                    this.color = {
+                        r: 255,
+                        g: 255,
+                        b: 255
+                    };
+                    this.time = 0;
+                }
+                
+                update() {
+                    this.time += 0.016;
+                    this.radius += this.speed;
+                    this.alpha = Math.max(0, this.alpha - 0.01);
+                    this.lineWidth = 2 * this.alpha;
+                    return this.alpha > 0 && this.radius < this.maxRadius;
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.alpha * 0.5})`;
+                    ctx.lineWidth = this.lineWidth;
+                    ctx.stroke();
+                }
+            }
+            
+            // Store active ripples
+            const ripples = [];
+            
+            // Animation loop
+            function animate(timestamp) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Update and draw ripples
+                for (let i = ripples.length - 1; i >= 0; i--) {
+                    const ripple = ripples[i];
+                    const isActive = ripple.update();
+                    
+                    if (isActive) {
+                        ripple.draw();
+                    } else {
+                        ripples.splice(i, 1);
+                    }
+                }
+                
+                // Apply smoother distortion to words
+                wordElements.forEach(word => {
+                    const rect = word.getBoundingClientRect();
+                    const wordCenter = {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                    
+                    // Calculate distortion from all ripples
+                    let totalDistortion = { x: 0, y: 0, rotation: 0, scale: 1 };
+                    
+                    ripples.forEach(ripple => {
+                        const dx = wordCenter.x - ripple.x;
+                        const dy = wordCenter.y - ripple.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const rippleEdge = ripple.radius;
+                        const rippleWidth = 120; // Wider ripple effect zone
+                        
+                        // Check if word is within the ripple effect zone
+                        if (Math.abs(distance - rippleEdge) < rippleWidth) {
+                            // Smoother edge factor with cubic easing
+                            const rawEdgeFactor = 1 - Math.abs(distance - rippleEdge) / rippleWidth;
+                            const edgeFactor = Math.pow(rawEdgeFactor, 2) * (3 - 2 * rawEdgeFactor); // Cubic smoothing
+                            const angle = Math.atan2(dy, dx);
+                            
+                            // Apply distortion based on position relative to ripple
+                            totalDistortion.x += Math.cos(angle) * edgeFactor * 15 * ripple.alpha;
+                            totalDistortion.y += Math.sin(angle) * edgeFactor * 15 * ripple.alpha;
+                            totalDistortion.rotation += edgeFactor * 0.03 * ripple.alpha;
+                            
+                            // Smoother scale effect
+                            const scaleFactor = 1 + edgeFactor * 0.08 * ripple.alpha;
+                            totalDistortion.scale *= scaleFactor;
+                            
+                            // Add wobble effect
+                            const wobbleFrequency = 3;
+                            const wobbleAmplitude = 2;
+                            const wobble = Math.sin(ripple.time * wobbleFrequency) * wobbleAmplitude * edgeFactor * ripple.alpha;
+                            totalDistortion.x += wobble * Math.cos(angle + Math.PI/2);
+                            totalDistortion.y += wobble * Math.sin(angle + Math.PI/2);
+                        }
+                    });
+                    
+                    // Apply combined distortion to the word with GSAP for smoother animation
+                    gsap.to(word, {
+                        x: totalDistortion.x,
+                        y: totalDistortion.y,
+                        rotation: totalDistortion.rotation,
+                        scale: totalDistortion.scale,
+                        duration: 0.6,
+                        ease: "elastic.out(1.2, 0.5)",
+                        overwrite: "auto"
+                    });
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // Add ripple on click with multiple ripples
+            document.addEventListener('click', (e) => {
+                // Create main ripple immediately
+                ripples.push(new Ripple(e.clientX, e.clientY, 0, 5.5, 1));
+                
+                // Create secondary ripples with initial radius offsets
+                // This creates the effect of multiple ripples without delays
+                ripples.push(new Ripple(e.clientX, e.clientY, 40, 5, 0.9));
+                ripples.push(new Ripple(e.clientX, e.clientY, 80, 4.5, 0.8));
+                ripples.push(new Ripple(e.clientX, e.clientY, 120, 4, 0.7));
+                
+                // If too many ripples, remove the oldest ones
+                while (ripples.length > 12) {
+                    ripples.shift();
+                }
+            });
+            
+            // Smooth 3D tilt effect with GSAP
+            let targetRotationX = 0;
+            let targetRotationY = 0;
+            let isMouseInside = true;
+            
+            // Update tilt with smooth interpolation
+            function updateTilt() {
+                gsap.to(containerWrapper, {
+                    rotationX: targetRotationX,
+                    rotationY: targetRotationY,
+                    transformPerspective: 1000,
+                    duration: isMouseInside ? 0.8 : 1.5,
+                    ease: isMouseInside ? "power2.out" : "elastic.out(1, 0.75)"
+                });
+            }
+            
+            // Mouse movement handler
+            document.addEventListener('mousemove', (e) => {
+                isMouseInside = true;
+                
+                // Calculate tilt based on mouse position
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                
+                // More gentle tilt (10 degrees max)
+                targetRotationX = ((e.clientY - centerY) / centerY) * 10;
+                targetRotationY = ((centerX - e.clientX) / centerX) * 10;
+                
+                updateTilt();
+            });
+            
+            // Reset on mouse leave with slow animation
+            document.addEventListener('mouseleave', () => {
+                isMouseInside = false;
+                targetRotationX = 0;
+                targetRotationY = 0;
+                updateTilt();
+            });
+            
+            // Device orientation for mobile
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', (e) => {
+                    // Check if we have the data we need
+                    if (e.beta === null || e.gamma === null) return;
+                    
+                    // Beta is front-to-back tilt in degrees, where front is positive
+                    // Gamma is left-to-right tilt in degrees, where right is positive
+                    targetRotationX = -Math.min(Math.max(e.beta - 45, -10), 10); // Adjust for natural holding position
+                    targetRotationY = Math.min(Math.max(e.gamma, -10), 10);
+                    
+                    gsap.to(containerWrapper, {
+                        rotationX: targetRotationX,
+                        rotationY: targetRotationY,
+                        transformPerspective: 1000,
+                        duration: 0.8,
+                        ease: "power2.out"
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
