@@ -19,6 +19,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            -webkit-tap-highlight-color: transparent; /* Prevent blue flash on tap */
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none; /* For Safari */
         }
 
         .container {
@@ -324,12 +327,13 @@
                     targetRotationX = -Math.min(Math.max(e.beta - 45, -10), 10); // Adjust for natural holding position
                     targetRotationY = Math.min(Math.max(e.gamma, -10), 10);
                     
+                    // More responsive on mobile - reduced duration and different easing
                     gsap.to(containerWrapper, {
                         rotationX: targetRotationX,
                         rotationY: targetRotationY,
                         transformPerspective: 1000,
-                        duration: 0.8,
-                        ease: "power2.out"
+                        duration: 0.3, // Faster response time for mobile
+                        ease: "power1.out" // More direct, less elastic response
                     });
                 });
             }
