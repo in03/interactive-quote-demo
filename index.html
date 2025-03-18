@@ -167,7 +167,8 @@
             pointer-events: none;
             transition: opacity 0.5s ease;
             z-index: 1000;
-            padding: 1rem;
+            padding: 2rem;
+            box-sizing: border-box;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -183,13 +184,14 @@
             padding: 4rem;
             border-radius: 15px;
             max-width: 600px;
-            width: 90%;
+            width: 100%;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin: 2rem auto;
+            margin: auto;
+            box-sizing: border-box;
             overflow-y: auto;
             max-height: calc(100vh - 4rem);
         }
@@ -263,11 +265,14 @@
                 margin-top: 2rem;
             }
 
+            .letter-overlay {
+                padding: 1.5rem;
+            }
+
             .letter-card {
                 padding: 2.5rem;
-                margin: 1rem;
-                width: calc(100% - 2rem);
-                max-height: calc(100vh - 2rem);
+                width: 100%;
+                max-height: calc(100vh - 3rem);
             }
 
             .letter-content {
@@ -282,8 +287,13 @@
                 line-height: 1.4;
             }
 
+            .letter-overlay {
+                padding: 1rem;
+            }
+
             .letter-card {
                 padding: 2rem;
+                max-height: calc(100vh - 2rem);
             }
 
             .letter-content {
@@ -305,12 +315,17 @@
             <button class="close-letter">×</button>
             <div class="letter-content">Dear Craig,
 
-Thank you for your kindness, generosity and excellent leadership. Thank you for encouraging me to keep my eyes on the Lord and bring my situations to Him. This one question has changed my life and the lives of others, as I continue to introduce it to them.
+Thank you so much.
 
-You truly embody Biblical servant leadership, and it has been a blessing and inspiration to follow.
+Thank you for your selflessness and servant heart. Thank you for your kindness, generosity and excellent leadership. Most of all, thank you for encouraging me to keep my eyes on the Lord and bring my situations to Him at all times. 
+
+This simple question you've introduced to me has changed my life, and continues to make an impact as I share it with others.
+
+It is such a blessing to have to have grown, not just professionally, but spiritually in my time with the IT team. Thanks for spear-heading a God-honouring, God-fearing culture, even when we've been swamped. Putting God first in the busy times is absolutely key, and it's a practice I'll keep up wherever I go.
+
+You truly embody Biblical servant leadership, and it has been a blessing and inspiration to follow your lead.
 
 God bless,
-
 Caleb</div>
         </div>
     </div>
