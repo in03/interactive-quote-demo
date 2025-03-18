@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Typography</title>
+    <title>The Best Question</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
@@ -84,9 +84,211 @@
             z-index: -1;
         }
 
+        /* Replace button styles with link styles */
+        .read-more-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, 120px);
+            font-family: "Cormorant Garamond", serif;
+            font-size: 1.4rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-decoration: none;
+            padding: 4px 0;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        .read-more-btn::before,
+        .read-more-btn::after {
+            content: "Read More";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            filter: blur(1px);
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .read-more-btn::before {
+            color: #ff00ff;
+            transform: translateX(var(--offset, 2px));
+        }
+
+        .read-more-btn::after {
+            color: #00ffff;
+            transform: translateX(calc(var(--offset, 2px) * -1));
+        }
+
+        .read-more-btn span {
+            position: relative;
+            display: inline-block;
+        }
+
+        .read-more-btn span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: right;
+        }
+
+        .read-more-btn:hover span::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Letter card styles */
+        .letter-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .letter-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .letter-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4rem;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 2rem auto;
+            overflow-y: auto;
+            max-height: calc(100vh - 4rem);
+        }
+
+        .letter-overlay.visible .letter-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Paper texture overlay */
+        .letter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/png;base64,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");
+            opacity: 0.03;
+            border-radius: 15px;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .letter-content {
+            font-size: 1.3rem;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.95);
+            white-space: pre-line;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .close-letter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .close-letter:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Responsive styles */
         @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
             .text-container {
                 font-size: 2.5rem;
+                margin-bottom: 3rem;
+            }
+
+            .read-more-btn {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                margin-top: 2rem;
+            }
+
+            .letter-card {
+                padding: 2.5rem;
+                margin: 1rem;
+                width: calc(100% - 2rem);
+                max-height: calc(100vh - 2rem);
+            }
+
+            .letter-content {
+                font-size: 1.2rem;
+                line-height: 1.8;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .text-container {
+                font-size: 2rem;
+                line-height: 1.4;
+            }
+
+            .letter-card {
+                padding: 2rem;
+            }
+
+            .letter-content {
+                font-size: 1.1rem;
+                line-height: 1.7;
             }
         }
     </style>
@@ -95,6 +297,22 @@
     <canvas class="ripple-canvas"></canvas>
     <div class="container">
         <div class="text-container"></div>
+        <button class="read-more-btn"><span>Read More</span></button>
+    </div>
+
+    <div class="letter-overlay">
+        <div class="letter-card">
+            <button class="close-letter">×</button>
+            <div class="letter-content">Dear Craig,
+
+Thank you for your kindness, generosity and excellent leadership. Thank you for encouraging me to keep my eyes on the Lord and bring my situations to Him. This one question has changed my life and the lives of others, as I continue to introduce it to them.
+
+You truly embody Biblical servant leadership, and it has been a blessing and inspiration to follow.
+
+God bless,
+
+Caleb</div>
+        </div>
     </div>
 
     <script>
@@ -103,6 +321,10 @@
             const container = document.querySelector('.text-container');
             const containerWrapper = document.querySelector('.container');
             const words = text.split(' ');
+            const readMoreBtn = document.querySelector('.read-more-btn');
+            const letterOverlay = document.querySelector('.letter-overlay');
+            const closeLetterBtn = document.querySelector('.close-letter');
+            const ripples = [];
             
             // Create and animate words
             function createWords() {
@@ -182,12 +404,39 @@
                     ctx.stroke();
                 }
             }
-            
-            // Store active ripples
-            const ripples = [];
-            
+
+            function updateButtonVisibility() {
+                let maxRippleEffect = 0;
+                const btnRect = readMoreBtn.getBoundingClientRect();
+                const btnCenter = {
+                    x: btnRect.left + btnRect.width / 2,
+                    y: btnRect.top + btnRect.height / 2
+                };
+
+                ripples.forEach(ripple => {
+                    const dx = btnCenter.x - ripple.x;
+                    const dy = btnCenter.y - ripple.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const rippleEdge = ripple.radius;
+                    const rippleWidth = 120;
+
+                    if (Math.abs(distance - rippleEdge) < rippleWidth) {
+                        const rawEdgeFactor = 1 - Math.abs(distance - rippleEdge) / rippleWidth;
+                        const edgeFactor = Math.pow(rawEdgeFactor, 2) * (3 - 2 * rawEdgeFactor);
+                        maxRippleEffect = Math.max(maxRippleEffect, edgeFactor * ripple.alpha);
+                    }
+                });
+
+                // Update button opacity and chromatic aberration
+                readMoreBtn.style.opacity = Math.max(parseFloat(readMoreBtn.style.opacity) || 0, maxRippleEffect);
+                const baseOffset = 2;
+                const maxOffset = 6;
+                const currentOffset = baseOffset + (maxOffset - baseOffset) * maxRippleEffect;
+                readMoreBtn.style.setProperty('--offset', `${currentOffset}px`);
+            }
+
             // Animation loop
-            function animate(timestamp) {
+            function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 // Update and draw ripples
@@ -201,6 +450,8 @@
                         ripples.splice(i, 1);
                     }
                 }
+
+                updateButtonVisibility();
                 
                 // Apply smoother distortion to words
                 wordElements.forEach(word => {
@@ -219,27 +470,22 @@
                         const dy = wordCenter.y - ripple.y;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         const rippleEdge = ripple.radius;
-                        const rippleWidth = 120; // Wider ripple effect zone
+                        const rippleWidth = 120;
                         
-                        // Check if word is within the ripple effect zone
                         if (Math.abs(distance - rippleEdge) < rippleWidth) {
-                            // Smoother edge factor with cubic easing
                             const rawEdgeFactor = 1 - Math.abs(distance - rippleEdge) / rippleWidth;
-                            const edgeFactor = Math.pow(rawEdgeFactor, 2) * (3 - 2 * rawEdgeFactor); // Cubic smoothing
+                            const edgeFactor = Math.pow(rawEdgeFactor, 2) * (3 - 2 * rawEdgeFactor);
                             const angle = Math.atan2(dy, dx);
                             
                             maxRippleEffect = Math.max(maxRippleEffect, edgeFactor * ripple.alpha);
                             
-                            // Apply distortion based on position relative to ripple
                             totalDistortion.x += Math.cos(angle) * edgeFactor * 15 * ripple.alpha;
                             totalDistortion.y += Math.sin(angle) * edgeFactor * 15 * ripple.alpha;
                             totalDistortion.rotation += edgeFactor * 0.03 * ripple.alpha;
                             
-                            // Smoother scale effect
                             const scaleFactor = 1 + edgeFactor * 0.08 * ripple.alpha;
                             totalDistortion.scale *= scaleFactor;
                             
-                            // Add wobble effect
                             const wobbleFrequency = 3;
                             const wobbleAmplitude = 2;
                             const wobble = Math.sin(ripple.time * wobbleFrequency) * wobbleAmplitude * edgeFactor * ripple.alpha;
@@ -248,13 +494,7 @@
                         }
                     });
                     
-                    // Update chromatic aberration
-                    const baseOffset = 2;
-                    const maxOffset = 8;
-                    const currentOffset = baseOffset + (maxOffset - baseOffset) * maxRippleEffect;
-                    word.style.setProperty('--offset', `${currentOffset}px`);
-                    
-                    // Apply combined distortion to the word with GSAP for smoother animation
+                    // Apply combined distortion to the word with GSAP
                     gsap.to(word, {
                         x: totalDistortion.x,
                         y: totalDistortion.y,
@@ -269,6 +509,7 @@
                 requestAnimationFrame(animate);
             }
             
+            // Start animation loop
             animate();
             
             // Add ripple on click with multiple ripples
@@ -277,7 +518,6 @@
                 ripples.push(new Ripple(e.clientX, e.clientY, 0, 5.5, 1));
                 
                 // Create secondary ripples with initial radius offsets
-                // This creates the effect of multiple ripples without delays
                 ripples.push(new Ripple(e.clientX, e.clientY, 40, 5, 0.9));
                 ripples.push(new Ripple(e.clientX, e.clientY, 80, 4.5, 0.8));
                 ripples.push(new Ripple(e.clientX, e.clientY, 120, 4, 0.7));
@@ -308,18 +548,16 @@
             document.addEventListener('mousemove', (e) => {
                 isMouseInside = true;
                 
-                // Calculate tilt based on mouse position
                 const centerX = window.innerWidth / 2;
                 const centerY = window.innerHeight / 2;
                 
-                // More gentle tilt (10 degrees max)
                 targetRotationX = ((e.clientY - centerY) / centerY) * 10;
                 targetRotationY = ((centerX - e.clientX) / centerX) * 10;
                 
                 updateTilt();
             });
             
-            // Reset on mouse leave with slow animation
+            // Reset on mouse leave
             document.addEventListener('mouseleave', () => {
                 isMouseInside = false;
                 targetRotationX = 0;
@@ -330,24 +568,41 @@
             // Device orientation for mobile
             if (window.DeviceOrientationEvent) {
                 window.addEventListener('deviceorientation', (e) => {
-                    // Check if we have the data we need
                     if (e.beta === null || e.gamma === null) return;
                     
-                    // Beta is front-to-back tilt in degrees, where front is positive
-                    // Gamma is left-to-right tilt in degrees, where right is positive
-                    targetRotationX = -Math.min(Math.max(e.beta - 45, -10), 10); // Adjust for natural holding position
+                    targetRotationX = -Math.min(Math.max(e.beta - 45, -10), 10);
                     targetRotationY = Math.min(Math.max(e.gamma, -10), 10);
                     
-                    // More responsive on mobile - reduced duration and different easing
                     gsap.to(containerWrapper, {
                         rotationX: targetRotationX,
                         rotationY: targetRotationY,
                         transformPerspective: 1000,
-                        duration: 0.3, // Faster response time for mobile
-                        ease: "power1.out" // More direct, less elastic response
+                        duration: 0.3,
+                        ease: "power1.out"
                     });
                 });
             }
+
+            // Letter overlay interaction
+            readMoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                letterOverlay.classList.add('visible');
+            });
+
+            closeLetterBtn.addEventListener('click', () => {
+                letterOverlay.classList.remove('visible');
+            });
+
+            letterOverlay.addEventListener('click', (e) => {
+                if (e.target === letterOverlay) {
+                    letterOverlay.classList.remove('visible');
+                }
+            });
+
+            // Prevent ripple effect when clicking the letter card
+            document.querySelector('.letter-card').addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         });
     </script>
 </body>
