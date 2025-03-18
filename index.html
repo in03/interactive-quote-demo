@@ -42,6 +42,7 @@
         }
 
         .word {
+            --offset: 2px;
             display: inline-block;
             opacity: 0;
             filter: blur(20px);
@@ -57,19 +58,20 @@
             position: absolute;
             left: 0;
             top: 0;
-            opacity: 0.4;
+            opacity: 0.3; /* More subtle by default */
             filter: blur(1px);
             pointer-events: none;
+            transition: transform 0.3s ease;
         }
 
         .word::before {
             color: #ff00ff;
-            transform: translateX(5px);
+            transform: translateX(calc(var(--offset) * 1));
         }
 
         .word::after {
             color: #00ffff;
-            transform: translateX(-5px);
+            transform: translateX(calc(var(--offset) * -1));
         }
 
         .ripple-canvas {
@@ -210,6 +212,7 @@
                     
                     // Calculate distortion from all ripples
                     let totalDistortion = { x: 0, y: 0, rotation: 0, scale: 1 };
+                    let maxRippleEffect = 0;
                     
                     ripples.forEach(ripple => {
                         const dx = wordCenter.x - ripple.x;
@@ -224,6 +227,8 @@
                             const rawEdgeFactor = 1 - Math.abs(distance - rippleEdge) / rippleWidth;
                             const edgeFactor = Math.pow(rawEdgeFactor, 2) * (3 - 2 * rawEdgeFactor); // Cubic smoothing
                             const angle = Math.atan2(dy, dx);
+                            
+                            maxRippleEffect = Math.max(maxRippleEffect, edgeFactor * ripple.alpha);
                             
                             // Apply distortion based on position relative to ripple
                             totalDistortion.x += Math.cos(angle) * edgeFactor * 15 * ripple.alpha;
@@ -242,6 +247,12 @@
                             totalDistortion.y += wobble * Math.sin(angle + Math.PI/2);
                         }
                     });
+                    
+                    // Update chromatic aberration
+                    const baseOffset = 2;
+                    const maxOffset = 8;
+                    const currentOffset = baseOffset + (maxOffset - baseOffset) * maxRippleEffect;
+                    word.style.setProperty('--offset', `${currentOffset}px`);
                     
                     // Apply combined distortion to the word with GSAP for smoother animation
                     gsap.to(word, {
