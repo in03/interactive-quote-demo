@@ -1,6 +1,7 @@
-# Interactive Quote Demo
+# The Best Question
 
-An interactive, visually pretty web page displaying a meaningful quote with dynamic typography and interactive ripple effects. Created as a farewell gift to honor my boss and his valuable advice.
+An interactive, visually pretty web page displaying [The Best Question](https://www.goodreads.com/book/show/59317244-living-fearless).
+Created as a farewell gift to honour my boss and his valuable advice.
 
 ## Features
 
